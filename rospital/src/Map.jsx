@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, useMap, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, useMap, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import "leaflet.markercluster/dist/MarkerCluster.css";
 import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from "@mui/material";
 
 
 // Custom Control Component with Dropdowns and Slider
@@ -130,45 +130,15 @@ const DisableZoomControl = () => {
   return null;
 };
 
-
-const MarkerClusterGroup = ({ geojsonData }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (!geojsonData) return;
-
-    const markers = L.markerClusterGroup();
-
-    geojsonData.features.forEach((feature) => {
-      const { geometry, properties } = feature;
-
-      if (geometry.type === "Point") {
-        const [longitude, latitude] = geometry.coordinates;
-        const marker = L.marker([latitude, longitude], {
-          title: properties.name || "Unknown Location",
-        });
-        marker.bindPopup(`<b>${properties.name || "Unknown Location"}</b><br>${properties.street || ""}`);
-        markers.addLayer(marker);
-      }
-    });
-
-    map.addLayer(markers);
-
-    return () => {
-      map.removeLayer(markers); // Cleanup when component unmounts or data changes
-    };
-  }, [geojsonData, map]);
-
-  return null;
-};
-
 // Map Component
 const Map = () => {
   const [geojsonData, setGeojsonData] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
+  const [popupOpen, setPopupOpen] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState(null);
 
   useEffect(() => {
-    fetch("/exportSPITALE.geojson")
+    fetch("/spitale.geojson")
       .then((response) => response.json())
       .then((data) => setGeojsonData(data))
       .catch((error) => console.error("Error loading GeoJSON:", error));
@@ -200,7 +170,22 @@ const Map = () => {
     }
   }, []);
 
+  const onEachFeature = (feature, layer) => {
+    if (feature.properties) {
+      layer.on("click", () => {
+        setSelectedFeature(feature.properties);
+        setPopupOpen(true);
+      });
+    }
+  };
+
+  const handlePopupClose = () => {
+    setPopupOpen(false);
+    setSelectedFeature(null);
+  };
+
   return (
+    <>
     <MapContainer
       center={[45.9432, 24.9668]} // Center of Romania
       zoom={7}
@@ -212,12 +197,42 @@ const Map = () => {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
-      {geojsonData && <GeoJSON data={geojsonData} />}
-      {/* {geojsonData && <MarkerClusterGroup geojsonData={geojsonData} />} */}
+      {geojsonData && (
+        <GeoJSON 
+          data={geojsonData}
+          onEachFeature={onEachFeature} />)}
       {userLocation && <Marker position={[userLocation.latitude, userLocation.longitude]} />}
       <MapZoomHandler userLocation={userLocation} />
       <MapControls /> {/* Adaugă dropdown-urile și slider-ul */}
     </MapContainer>
+    
+    <Dialog open={popupOpen} onClose={handlePopupClose}>
+        <DialogTitle>Hospital Details</DialogTitle>
+        <DialogContent>
+          {selectedFeature ? (
+            <Box>
+              {Object.entries(selectedFeature).map(([key, value]) => (
+                <Box key={key} sx={{ marginBottom: "8px" }}>
+                  <Typography variant="body1" sx={{ fontWeight: "bold", display: "inline" }}>
+                    {key}:{" "}
+                  </Typography>
+                  <Typography variant="body1" sx={{ display: "inline" }}>
+                    {value || "Not available"}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            <Typography variant="body2">Loading...</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePopupClose} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
   );
 };
 

@@ -1,8 +1,9 @@
 // Import necessary libraries 
-import React, { useRef } from 'react';
-import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent, CardMedia, Box, autocompleteClasses } from '@mui/material';
+import React, { useRef,useState } from 'react';
+import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent, CardMedia, Box, autocompleteClasses,IconButton} from '@mui/material';
 import { makeStyles } from '@mui/styles';
 import { useNavigate } from 'react-router-dom';
+import { AccountCircle } from "@mui/icons-material"; // Import the user icon
 import homeImage from '/src/photos/appointment-top-picture.png';
 import wlcpageimg2 from '/src/photos/wlcpageimg2.png';
 import wlcpageimg3 from '/src/photos/wlcpagephoto.png';
@@ -57,42 +58,52 @@ const useStyles = makeStyles({
 function HomePage() {
   const classes = useStyles();
   const navigate = useNavigate();
-
   // Create a ref for the "About Us" section
   const aboutUsRef = useRef(null);
   const servicesRef = useRef(null);
-
-  // Scroll to the "About Us" section
-  // Scroll to the "About Us" section with offset
-const handleScrollToAbout = () => {
-  if (aboutUsRef.current) {
-    const offset = -120; // Adjust the offset value to scroll further upwards
-    const elementPosition = aboutUsRef.current.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset + offset;
-
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: "smooth",
-    });
-  }
-};
-
+  // Simulated login state (replace with real authentication logic)
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Scroll to the top of the page
-const handleScrollToHome = () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-};
+  const handleScrollToHome = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-const handleScrollToServices = () => {
-  if (servicesRef.current) {
-    const offset = -180; // Adjust the offset value to scroll further upwards
-    const elementPosition = servicesRef.current.getBoundingClientRect().top;
-    const offsetPosition = elementPosition + window.pageYOffset + offset;
+  // Scroll to the "About Us" section with offset
+  const handleScrollToAbout = () => {
+    if (aboutUsRef.current) {
+      const offset = -120; // Adjust the offset value to scroll further upwards
+      const elementPosition = aboutUsRef.current.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset + offset;
 
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: "smooth",
-    });
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  // Scroll to the "Services" section with offset
+  const handleScrollToServices = () => {
+    if (servicesRef.current) {
+      const offset = -180; // Adjust the offset value to scroll further upwards
+      const elementPosition = servicesRef.current.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.pageYOffset + offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+    }
+  };
+
+const handleBookAppointment = () => {
+  if (isLoggedIn) {
+    // Navigate to the appointment page if logged in
+    navigate("/appointment");
+  } else {
+    // Navigate to the login page with a message if not logged in
+    navigate("/login", { state: { message: "Please login to book an appointment." } });
   }
 };
 
@@ -156,6 +167,7 @@ const handleScrollToServices = () => {
           </Box>
 
           {/* Login Button */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
           <Button
             variant="contained"
             sx={{
@@ -172,6 +184,16 @@ const handleScrollToServices = () => {
           >
             Login
           </Button>
+          <IconButton
+            sx={{
+              color: "#fff",
+              "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)" },
+            }}
+            //onClick={() => navigate("/profile")} // Navigate to user profile
+            >
+            <AccountCircle sx={{ fontSize: "2rem" }} />
+          </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -180,30 +202,29 @@ const handleScrollToServices = () => {
         <img src={homeImage} alt="Banner" className={classes.bannerImage} />
         <Box className={classes.headerOverlay}>
           <Typography variant="h3" style={{ fontWeight: 'bold', marginBottom: '10px', color: '#1F2B6C' }}>Finding the right medic has never been easier</Typography>
-          {/* <Typography variant="h6">Caring for life</Typography> */}
         </Box>
       </Box>
 
-      <Box sx={{ textAlign: 'center', marginTop: '-50px', marginBottom: '20px' }}>
-  <Button
-    variant="contained"
-    sx={{
-      backgroundColor: '#03A9F4',
-      color: '#fff',
-      textTransform: 'capitalize',
-      padding: '10px 20px',
-      borderRadius: '20px',
-      fontSize: '1rem',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
-      '&:hover': {
-        backgroundColor: '#0288D1',
-      },
-    }}
-    onClick={() => navigate('/appointment')} // Navigate to appointment page
-  >
-    Book an appointment
-  </Button>
-</Box>
+    <Box sx={{ textAlign: 'center', marginTop: '-50px', marginBottom: '20px' }}>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: '#03A9F4',
+          color: '#fff',
+          textTransform: 'capitalize',
+          padding: '10px 20px',
+          borderRadius: '20px',
+          fontSize: '1rem',
+          boxShadow: '0 4px 6px rgba(0, 0, 0, 0.2)',
+          '&:hover': {
+            backgroundColor: '#0288D1',
+          },
+        }}
+        onClick={handleBookAppointment}
+      >
+      Book an appointment
+      </Button>
+    </Box>
 
 <Container>
         {/* Features Section */}

@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
+import { AccountCircle } from "@mui/icons-material"; // Import the user icon
 import {
   AppBar,
   Toolbar,
@@ -14,6 +15,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  IconButton
 } from "@mui/material";
 import Map from "./Map";
 
@@ -52,7 +54,7 @@ function AppointmentPage() {
   
   // Load GeoJSON data
   useEffect(() => {
-    fetch("/final_exportSPITALE.geojson")
+    fetch("/spitale.geojson")
       .then((response) => response.json())
       .then((data) => {
         // Map all feature properties into clinics array
@@ -126,20 +128,20 @@ useEffect(() => {
           }}
         >
           {/* Logo */}
-                    <Button
-                      sx={{
-                      fontWeight: "bold",
-                      color: "#fff",
-                      fontSize: "1.25rem",
-                      textTransform: "none",
-                      "&:hover": {
-                      backgroundColor: "transparent",
-                      },
-                    }}
-                    onClick={() => navigate("/")}
-                    >
-                      RO<span style={{ color: "#03A9F4" }}>SPITAL</span>
-                    </Button>
+          <Button
+            sx={{
+              fontWeight: "bold",
+              color: "#fff",
+              fontSize: "1.25rem",
+              textTransform: "none",
+              "&:hover": {
+                backgroundColor: "transparent",
+              },
+            }}
+            onClick={() => navigate("/")}
+          >
+          RO<span style={{ color: "#03A9F4" }}>SPITAL</span>
+          </Button>
 
           {/* Navigation */}
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -155,22 +157,33 @@ useEffect(() => {
           </Box>
 
           {/* Login Button */}
-                    <Button
-                      variant="contained"
-                      sx={{
-                        backgroundColor: "#03A9F4",
-                        color: "#fff",
-                        textTransform: "capitalize",
-                        borderRadius: "20px",
-                        padding: "5px 20px",
-                        "&:hover": {
-                          backgroundColor: "#0288D1",
-                        },
-                      }}
-                      onClick={() => navigate('/login')} // Navigate to login page
-                    >
-                      Login
-                    </Button>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Button
+              variant="contained"
+                sx={{
+                  backgroundColor: "#03A9F4",
+                  color: "#fff",
+                  textTransform: "capitalize",
+                  borderRadius: "20px",
+                  padding: "5px 20px",
+                  "&:hover": {
+                    backgroundColor: "#0288D1",
+                  },
+                }}
+                onClick={() => navigate('/login')} // Navigate to login page
+              >
+              Login
+            </Button>
+            <IconButton
+              sx={{
+                color: "#fff",
+                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)" },
+              }}
+              //onClick={() => navigate("/profile")} // Navigate to user profile
+            >
+            <AccountCircle sx={{ fontSize: "2rem" }} />
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -231,7 +244,7 @@ useEffect(() => {
                       variant="body2"
                       sx={{ color: "#757575" }}
                     >
-                      {clinic["addr:street"] || "Street not available"}
+                      {clinic.street}
                     </Typography>
                   </Box>
                 </ListItem>
@@ -253,7 +266,9 @@ useEffect(() => {
           <DialogContent>
             {selectedClinic ? (
               <Box>
-              {Object.entries(selectedClinic).map(([key, value]) => (
+              {Object.entries(selectedClinic)
+                .filter(([key]) => key !== "@geometry") // Exclude the @geometry key
+                .map(([key, value]) => (
                 <Box key={key} sx={{ marginBottom: "8px" }}>
                   <Typography variant="body1" sx={{ fontWeight: "bold", display: "inline" }}>
                     {key}:{" "}

@@ -1,5 +1,5 @@
 import React, { useRef,useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate,useLocation } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -13,16 +13,20 @@ import {
   Paper,
   Link,
   Container,
+  Switch
 } from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Visibility, VisibilityOff, Person, MedicalServices,AccountCircle} from "@mui/icons-material";
 
 function LoginPage() {
   const [isLogin, setIsLogin] = useState(true); // Toggle between Login and Sign Up
+  const [isDoctor, setIsDoctor] = useState(false); // Toggle between Patient and Doctor
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   // Refs for scrolling
   const aboutUsRef = useRef(null);
   const servicesRef = useRef(null);
+  const location = useLocation();
+  const message = location.state?.message || "";
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -30,6 +34,10 @@ function LoginPage() {
 
   const toggleForm = () => {
     setIsLogin(!isLogin);
+  };
+
+  const handleRoleSwitch = () => {
+    setIsDoctor((prev) => !prev);
   };
 
   React.useEffect(() => {
@@ -78,20 +86,20 @@ const handleScrollToSection = (section) => {
           }}
         >
           {/* Logo */}
-                    <Button
-                      sx={{
-                      fontWeight: "bold",
-                      color: "#fff",
-                      fontSize: "1.25rem",
-                      textTransform: "none",
-                      "&:hover": {
-                      backgroundColor: "transparent",
-                      },
-                    }}
-                      onClick={() => navigate("/")}
-                    >
-                      RO<span style={{ color: "#03A9F4" }}>SPITAL</span>
-                    </Button>
+          <Button
+            sx={{
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: "1.25rem",
+            textTransform: "none",
+            "&:hover": {
+              backgroundColor: "transparent",
+              },
+            }}
+            onClick={() => navigate("/")}
+            >
+            RO<span style={{ color: "#03A9F4" }}>SPITAL</span>
+          </Button>
 
           {/* Navigation */}
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -107,21 +115,33 @@ const handleScrollToSection = (section) => {
           </Box>
 
           {/* Login Button */}
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#03A9F4",
-              color: "#fff",
-              textTransform: "capitalize",
-              borderRadius: "20px",
-              padding: "5px 20px",
-              "&:hover": {
-                backgroundColor: "#0288D1",
-              },
-            }}
-          >
-            Login
-          </Button>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: "#03A9F4",
+                color: "#fff",
+                textTransform: "capitalize",
+                borderRadius: "20px",
+                padding: "5px 20px",
+                "&:hover": {
+                  backgroundColor: "#0288D1",
+                },
+              }}
+              onClick={() => navigate('/login')} // Navigate to login page
+              >
+              Login
+            </Button>
+            <IconButton
+              sx={{
+                color: "#fff",
+                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)" },
+                }}
+                  //onClick={() => navigate("/profile")} // Navigate to user profile
+                >
+                <AccountCircle sx={{ fontSize: "2rem" }} />
+            </IconButton>
+          </Box>
         </Toolbar>
       </AppBar>
 
@@ -136,12 +156,13 @@ const handleScrollToSection = (section) => {
             marginTop: "64px", // Adjust for AppBar height
         }}
         >
+          
           {/* Left Section */}
               <Box
                 sx={{
                   position: "absolute",
-                  width: "30%",
-                  height: "70%",
+                  width: "25%",
+                  height: "80%",
                   transformStyle: "preserve-3d",
                   transition: "transform 0.8s",
                   transform: isLogin ? "rotateY(0deg)" : "rotateY(180deg)",
@@ -162,13 +183,44 @@ const handleScrollToSection = (section) => {
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    padding: 4,
-                    borderRadius: 2,
+                    padding: 3,
+                    borderRadius: 3,
                   }}
                 >
-                  <Typography variant="h4" gutterBottom align="center">
+                  <Typography
+                    gutterBottom
+                    align="center"
+                    sx={{
+                      fontSize: "1.8rem", // Slightly larger text
+                      fontWeight: "bold",
+                      color: "transparent",
+                      backgroundImage: "linear-gradient(90deg, #1F2B6C, #03A9F4)",
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                      textFillColor: "transparent",
+                      WebkitTextFillColor: "transparent",
+                      textShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                      letterSpacing: "0.1rem",
+                    }}
+                    >
                     Login
                   </Typography>
+                  
+                  <Typography
+                    variant="body1"
+                    align="center"
+                    sx={{
+                      color: message ? "red" : "#1F2B6C", // Red for message, blue for default
+                      fontSize: "1.0rem", // Slightly larger text
+                      fontWeight: 500, // Medium weight for emphasis
+                      fontStyle: "italic", // Italic for a softer tone
+                      textShadow: "0.5px 0.5px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+                      letterSpacing: "0.02rem", // Slight spacing for modern look
+                    }}
+                    >
+                    {message || "Please sign in to continue"}
+                  </Typography>
+
                   <TextField
                     label="Full name"
                     variant="outlined"
@@ -199,11 +251,43 @@ const handleScrollToSection = (section) => {
                     control={<Checkbox />}
                     label="Remember me"
                   />
+
+                  {/* Role Toggle */}
+                  <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 1,
+                  }}
+                  >
+                  <Person
+                  sx={{
+                    fontSize: "2rem",
+                    color: isDoctor ? "#bbb" : "#1F2B6C",
+                  }}
+                  />
+                  <Switch
+                  checked={isDoctor}
+                  onChange={handleRoleSwitch}
+                  sx={{
+                    "& .MuiSwitch-thumb": {
+                      backgroundColor: isDoctor ? "#03A9F4" : "#1F2B6C",
+                    },
+                  }}
+                  />
+                  <MedicalServices
+                    sx={{
+                      fontSize: "2rem",
+                      color: isDoctor ? "#1F2B6C" : "#bbb",
+                    }}
+                  />
+                  </Box>
                   <Button
                     variant="contained"
                     fullWidth
                     sx={{
-                      marginTop: 2,
+                      marginTop: 1,
                       backgroundColor: "#3751FE",
                       "&:hover": { backgroundColor: "#1F2B6C", transform: "scale(1.05)" }, // Added upscaling effect
                       transition: "transform 0.2s", // Smooth scaling animation
@@ -234,19 +318,48 @@ const handleScrollToSection = (section) => {
                   sx={{
                     position: "absolute",
                     width: "122%",
-                    height: "100%",
+                    height: "95%",
                     backfaceVisibility: "hidden",
                     transform: "rotateY(180deg)",
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "center",
                     alignItems: "center",
-                    padding: 4,
+                    padding: 3,
                     borderRadius: 2,
                   }}
                 >
-                  <Typography variant="h4" gutterBottom align="center">
-                    Create Account
+                  <Typography
+                    gutterBottom
+                    align="center"
+                    sx={{
+                      fontSize: "1.8rem", // Slightly larger text
+                      fontWeight: "bold",
+                      color: "transparent",
+                      backgroundImage: "linear-gradient(90deg, #1F2B6C, #03A9F4)",
+                      backgroundClip: "text",
+                      WebkitBackgroundClip: "text",
+                      textFillColor: "transparent",
+                      WebkitTextFillColor: "transparent",
+                      textShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+                      letterSpacing: "0.1rem",
+                    }}
+                    >
+                    Create your Account
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    align="center"
+                    sx={{
+                      color: "#444", // Slightly darker for better readability
+                      fontSize: "1.0rem", // Slightly larger text
+                      fontWeight: 500, // Medium weight for emphasis
+                      fontStyle: "italic", // Italic for a softer tone
+                      textShadow: "0.5px 0.5px 2px rgba(0, 0, 0, 0.1)", // Subtle shadow for depth
+                      letterSpacing: "0.02rem", // Slight spacing for modern look
+                    }}
+                    >
+                    Sign up to access our services and exclusive features
                   </Typography>
                   <TextField
                     label="Full name"
@@ -274,11 +387,44 @@ const handleScrollToSection = (section) => {
                       {showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </Box>
+                  
+                  {/* Role Toggle */}
+                  <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 1,
+                  }}
+                  >
+                  <Person
+                  sx={{
+                    fontSize: "2rem",
+                    color: isDoctor ? "#bbb" : "#1F2B6C",
+                  }}
+                  />
+                  <Switch
+                  checked={isDoctor}
+                  onChange={handleRoleSwitch}
+                  sx={{
+                    "& .MuiSwitch-thumb": {
+                      backgroundColor: isDoctor ? "#03A9F4" : "#1F2B6C",
+                    },
+                  }}
+                  />
+                  <MedicalServices
+                    sx={{
+                      fontSize: "2rem",
+                      color: isDoctor ? "#1F2B6C" : "#bbb",
+                    }}
+                  />
+                  </Box>
+
                   <Button
                     variant="contained"
                     fullWidth
                     sx={{
-                      marginTop: 2,
+                      marginTop: 1,
                       backgroundColor: "#3751FE",
                       "&:hover": { backgroundColor: "#1F2B6C", transform: "scale(1.05)" }, // Added upscaling effect
                       transition: "transform 0.2s", // Smooth scaling animation
