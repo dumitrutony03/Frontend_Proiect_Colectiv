@@ -1,16 +1,6 @@
 import React, { useState, useEffect } from "react";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-  List,
-  ListItem,
-  Chip,
-  TextField,
-} from "@mui/material";
 import Map from "./Map"; // Assuming you have a Map component implemented
+import NavBar from "./NavBar.jsx"; // Assuming you have a NavBar component implemented
 
 function AppointmentPageTest() {
   // State to hold the GeoJSON data and filters
@@ -71,72 +61,7 @@ useEffect(() => {
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", width: "100vw" }}>
       {/* Full-Width Header */}
-      <AppBar
-        position="static"
-        sx={{
-          position: "fixed", // Sticks at the top of the page
-          top: 0,
-          left: 0,
-          width: "100vw", // Ensure it spans full width
-          backgroundColor: "#1F2B6C",
-          boxShadow: "none",
-          zIndex: 1201, // Keep it above other content
-        }}
-      >
-        <Toolbar
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "0 20px", // Consistent padding
-            maxWidth: "1200px", // Center the header content
-            width: "100%",
-            margin: "0 auto", // Horizontally center the header content
-          }}
-        >
-          {/* Logo */}
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: "bold",
-              color: "#fff",
-            }}
-          >
-            RO<span style={{ color: "#03A9F4" }}>SPITAL</span>
-          </Typography>
-
-          {/* Navigation */}
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button color="inherit" sx={{ textTransform: "capitalize" }}>
-              Home
-            </Button>
-            <Button color="inherit" sx={{ textTransform: "capitalize" }}>
-              About us
-            </Button>
-            <Button color="inherit" sx={{ textTransform: "capitalize" }}>
-              Services
-            </Button>
-          </Box>
-
-          {/* Login Button */}
-          <Button
-            variant="contained"
-            sx={{
-              backgroundColor: "#03A9F4",
-              color: "#fff",
-              textTransform: "capitalize",
-              borderRadius: "20px",
-              padding: "5px 20px",
-              marginLeft: "20px", // Space between nav and button
-              "&:hover": {
-                backgroundColor: "#0288D1",
-              },
-            }}
-          >
-            Login
-          </Button>
-        </Toolbar>
-      </AppBar>
+      <NavBar />
 
       {/* Main Content */}
       <Box

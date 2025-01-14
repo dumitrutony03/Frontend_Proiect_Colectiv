@@ -1,20 +1,6 @@
 import React, { useRef,useState } from "react";
 import { useNavigate,useLocation } from 'react-router-dom';
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-  TextField,
-  IconButton,
-  Checkbox,
-  FormControlLabel,
-  Paper,
-  Link,
-  Container,
-  Switch
-} from "@mui/material";
+import NavBar from "./NavBar.jsx";
 import { Visibility, VisibilityOff, Person, MedicalServices,AccountCircle} from "@mui/icons-material";
 
 function LoginPage() {
@@ -60,90 +46,8 @@ const handleScrollToSection = (section) => {
 
   return (
     <Box sx={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      {/* Full-Width Header */}
-      <AppBar
-        position="static"
-        sx={{
-          position: "fixed", // Ensure it stays at the top
-          top: 0,
-          left: 0,
-          width: "100vw", // Use full viewport width
-          margin: 0,
-          padding: 0,
-          backgroundColor: "#1F2B6C",
-          boxShadow: "none",
-        }}
-      >
-        <Toolbar
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            maxWidth: "1200px", // Center and constrain content width
-            padding: "0 20px", // Add horizontal padding for inner content
-            width: "100%",
-            margin: "0 auto", // Center the content horizontally
-          }}
-        >
-          {/* Logo */}
-          <Button
-            sx={{
-            fontWeight: "bold",
-            color: "#fff",
-            fontSize: "1.25rem",
-            textTransform: "none",
-            "&:hover": {
-              backgroundColor: "transparent",
-              },
-            }}
-            onClick={() => navigate("/")}
-            >
-            RO<span style={{ color: "#03A9F4" }}>SPITAL</span>
-          </Button>
-
-          {/* Navigation */}
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button color="inherit" sx={{ textTransform: "capitalize" }} onClick={() => navigate("/")}>
-              Home
-            </Button>
-            <Button color="inherit" sx={{ textTransform: "capitalize" }} onClick={() => handleScrollToSection(aboutUsRef)}>
-              About us
-            </Button>
-            <Button color="inherit" sx={{ textTransform: "capitalize" }} onClick={() => handleScrollToSection(servicesRef)}>
-              Services
-            </Button>
-          </Box>
-
-          {/* Login Button */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Button
-              variant="contained"
-              sx={{
-                backgroundColor: "#03A9F4",
-                color: "#fff",
-                textTransform: "capitalize",
-                borderRadius: "20px",
-                padding: "5px 20px",
-                "&:hover": {
-                  backgroundColor: "#0288D1",
-                },
-              }}
-              onClick={() => navigate('/login')} // Navigate to login page
-              >
-              Login
-            </Button>
-            <IconButton
-              sx={{
-                color: "#fff",
-                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)" },
-                }}
-                  //onClick={() => navigate("/profile")} // Navigate to user profile
-                >
-                <AccountCircle sx={{ fontSize: "2rem" }} />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
+      {/* Navigation Bar */}
+      <NavBar />
 
       {/* Main Content */}
       <Container
