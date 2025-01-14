@@ -103,7 +103,7 @@ const handleBookAppointment = () => {
     navigate("/appointment");
   } else {
     // Navigate to the login page with a message if not logged in
-    navigate("/login", { state: { message: "Please login to book an appointment." } });
+    navigate("/LoginPage", { state: { message: "Please login to book an appointment." } });
   }
 };
 
@@ -180,7 +180,7 @@ const handleBookAppointment = () => {
                 backgroundColor: "#0288D1",
               },
             }}
-            onClick={() => navigate('/login')} // Navigate to login page
+            onClick={() => navigate('/LoginPage')} // Navigate to login page
           >
             Login
           </Button>

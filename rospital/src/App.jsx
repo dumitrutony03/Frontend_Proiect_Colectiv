@@ -1,11 +1,11 @@
-import React from 'react';
+import 'react';
 import './App.css';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Import Router, Route, and Routes
-import LoginPage from './LoginPage'; // Import LoginPage component
 import AppointmentPage from './AppointmentPage'; // Import AppointmentPage component
-import AppointmentPageTest from './AppointmentPageTest'
 import HomePage from './HomePage'
 import { CssBaseline } from '@mui/material'
+import RegisterPage from "./RegisterPage.jsx";
+import LoginPage from "./LoginPage.jsx";
 
 function App() {
   return (
@@ -15,9 +15,9 @@ function App() {
       <Routes> {/* Use Routes to define your app's routes */}
         {/* Define your routes here */}
         <Route index element={<HomePage />} /> {/* homepage route */}
-        <Route path="/login" element={<LoginPage />} /> {/* LoginPage route */}
-        <Route path="/appointment" element={<AppointmentPage />} /> {/* AppointmentPage route */}
-        <Route path="/appointmenttest" element={<AppointmentPageTest />} /> {/* AppointmentPage route */}
+        <Route path="/RegisterPage" element={<RegisterPage />} /> {/* RegisterPage route */}
+        <Route path="/LoginPage" element={<LoginPage />} /> {/* LoginPage route */}
+        <Route path="/AppointmentPage" element={<AppointmentPage />} /> {/* AppointmentPage route */}
       </Routes>
     </Router>
     </>
