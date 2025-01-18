@@ -1,16 +1,29 @@
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, useMap, Marker, Popup } from "react-leaflet";
+import {
+  MapContainer,
+  TileLayer,
+  GeoJSON,
+  Marker,
+  Popup,
+  useMap,
+} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import "leaflet.markercluster/dist/MarkerCluster.css";
-import "leaflet.markercluster/dist/MarkerCluster.Default.css";
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from "@mui/material";
-
+import DetailsDialog from "./DetailsDialog"; // Import the DetailsDialog component
+import useGeoJsonLoader from "./LoadJSON"; // Import the custom hook
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Typography,
+  Box,
+} from "@mui/material";
 
 // Custom Control Component with Dropdowns and Slider
 const MapControls = () => {
   const map = useMap();
-
   useEffect(() => {
     const customControl = L.control({ position: "topleft" });
 
@@ -34,12 +47,14 @@ const MapControls = () => {
       judetDropdown.style.border = "1px solid #ccc";
       judetDropdown.style.borderRadius = "4px";
       judetDropdown.style.cursor = "pointer";
-      ["Alege Județ", "Bihor", "Cluj", "Timiș", "Iași"].forEach((optionText) => {
-        const option = document.createElement("option");
-        option.value = optionText;
-        option.text = optionText;
-        judetDropdown.add(option);
-      });
+      ["Alege Județ", "Bihor", "Cluj", "Timiș", "Iași"].forEach(
+        (optionText) => {
+          const option = document.createElement("option");
+          option.value = optionText;
+          option.text = optionText;
+          judetDropdown.add(option);
+        }
+      );
 
       // Dropdown for Oras
       const orasDropdown = L.DomUtil.create("select", "", container);
@@ -47,12 +62,14 @@ const MapControls = () => {
       orasDropdown.style.border = "1px solid #ccc";
       orasDropdown.style.borderRadius = "4px";
       orasDropdown.style.cursor = "pointer";
-      ["Alege Oraș", "Oradea", "Cluj-Napoca", "Timișoara", "Iași"].forEach((optionText) => {
-        const option = document.createElement("option");
-        option.value = optionText;
-        option.text = optionText;
-        orasDropdown.add(option);
-      });
+      ["Alege Oraș", "Oradea", "Cluj-Napoca", "Timișoara", "Iași"].forEach(
+        (optionText) => {
+          const option = document.createElement("option");
+          option.value = optionText;
+          option.text = optionText;
+          orasDropdown.add(option);
+        }
+      );
 
       // Dropdown for Specialitati
       const specialitatiDropdown = L.DomUtil.create("select", "", container);
@@ -60,7 +77,13 @@ const MapControls = () => {
       specialitatiDropdown.style.border = "1px solid #ccc";
       specialitatiDropdown.style.borderRadius = "4px";
       specialitatiDropdown.style.cursor = "pointer";
-      ["Alege Specialitate", "Cardiologie", "Dermatologie", "Pediatrie", "Ortopedie"].forEach((optionText) => {
+      [
+        "Alege Specialitate",
+        "Cardiologie",
+        "Dermatologie",
+        "Pediatrie",
+        "Ortopedie",
+      ].forEach((optionText) => {
         const option = document.createElement("option");
         option.value = optionText;
         option.text = optionText;
@@ -133,16 +156,14 @@ const DisableZoomControl = () => {
 // Map Component
 const Map = () => {
   const [geojsonData, setGeojsonData] = useState(null);
+  const [clinicData, setClinicData] = useState(null);
+  const [filteredData, setFilteredData] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [popupOpen, setPopupOpen] = useState(false);
   const [selectedFeature, setSelectedFeature] = useState(null);
 
-  useEffect(() => {
-    fetch("/spitale.geojson")
-      .then((response) => response.json())
-      .then((data) => setGeojsonData(data))
-      .catch((error) => console.error("Error loading GeoJSON:", error));
-  }, []);
+  // Load GeoJSON and Clinic Data
+  useGeoJsonLoader(setGeojsonData, setClinicData, setFilteredData);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -184,54 +205,58 @@ const Map = () => {
     setSelectedFeature(null);
   };
 
+  // Custom Hospital Marker Icon
+  const hospitalIcon = new L.Icon({
+    iconUrl: "/src/photos/hospital.png", // Replace with the actual URL to the hospital icon image
+    iconSize: [40, 40], // Icon size (adjust accordingly)
+    iconAnchor: [20, 40], // Anchor point of the icon
+    popupAnchor: [0, -40], // Position of the popup
+  });
+
   return (
     <>
-    <MapContainer
-      center={[45.9432, 24.9668]} // Center of Romania
-      zoom={7}
-      style={{ height: "100vh", width: "100%" }}
-      zoomControl={false} // Disable default zoom control
-    >
-      <DisableZoomControl /> {/* Elimină complet controlul de zoom */}
-      <TileLayer
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      <MapContainer
+        center={[46.7712, 23.6236]} // Center of Cluj Napoca
+        zoom={13}
+        style={{ height: "100vh", width: "100%" }}
+        zoomControl={false} // Disable default zoom control
+      >
+        <DisableZoomControl /> {/* Remove zoom control */}
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        {geojsonData && (
+          <GeoJSON data={geojsonData} onEachFeature={onEachFeature} />
+        )}
+        {clinicData &&
+          clinicData.map((clinic, index) => (
+            <Marker
+              key={index}
+              position={[clinic.latitude, clinic.longitude]}
+              icon={hospitalIcon} // Use custom hospital icon
+              eventHandlers={{
+                click: () => {
+                  setSelectedFeature(clinic); // Set clinic on click
+                  setPopupOpen(true); // Open popup
+                },
+              }}
+            />
+          ))}
+        {userLocation && (
+          <Marker position={[userLocation.latitude, userLocation.longitude]} />
+        )}
+        <MapZoomHandler userLocation={userLocation} />
+        <MapControls /> {/* Add dropdowns and slider */}
+      </MapContainer>
+
+      {/* DIALOG POPUP */}
+      <DetailsDialog
+        open={popupOpen}
+        onClose={handlePopupClose}
+        title="Hospital Details"
+        details={selectedFeature}
       />
-      {geojsonData && (
-        <GeoJSON 
-          data={geojsonData}
-          onEachFeature={onEachFeature} />)}
-      {userLocation && <Marker position={[userLocation.latitude, userLocation.longitude]} />}
-      <MapZoomHandler userLocation={userLocation} />
-      <MapControls /> {/* Adaugă dropdown-urile și slider-ul */}
-    </MapContainer>
-    
-    <Dialog open={popupOpen} onClose={handlePopupClose}>
-        <DialogTitle>Hospital Details</DialogTitle>
-        <DialogContent>
-          {selectedFeature ? (
-            <Box>
-              {Object.entries(selectedFeature).map(([key, value]) => (
-                <Box key={key} sx={{ marginBottom: "8px" }}>
-                  <Typography variant="body1" sx={{ fontWeight: "bold", display: "inline" }}>
-                    {key}:{" "}
-                  </Typography>
-                  <Typography variant="body1" sx={{ display: "inline" }}>
-                    {value || "Not available"}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          ) : (
-            <Typography variant="body2">Loading...</Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handlePopupClose} color="primary">
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 };

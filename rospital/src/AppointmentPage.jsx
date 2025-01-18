@@ -1,250 +1,146 @@
 import React, { useRef, useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
-import { AccountCircle } from "@mui/icons-material"; // Import the user icon
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Box,
-  List,
-  ListItem,
-  Chip,
-  TextField,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  IconButton
-} from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import FullWidthHeader from "./Header";
+import DetailsDialog from "./DetailsDialog"; // Importăm componenta DetailsDialog pentru a arăta detaliile clinicii
+import useGeoJsonLoader from "./LoadJSON"; // Importăm hook-ul customizat pentru încărcarea fișierului GeoJSON
+import { Typography, Box, List, ListItem, TextField } from "@mui/material";
 import Map from "./Map";
 
 function AppointmentPage() {
-  // State to hold the GeoJSON data and filters
-  const [clinicData, setClinicData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [searchName, setSearchName] = useState("");
-  const navigate = useNavigate();
-  // Refs for scrolling
-  const aboutUsRef = useRef(null);
-  const servicesRef = useRef(null);
-  //Popup
-  const [selectedClinic, setSelectedClinic] = useState(null); // State for selected clinic
-  const [popupOpen, setPopupOpen] = useState(false); // State to manage popup visibility
-  //PopupClose
+  // State pentru stocarea datelor GeoJSON și filtre
+  const [clinicData, setClinicData] = useState([]); // Stocăm datele clinicilor
+  const [filteredData, setFilteredData] = useState([]); // Stocăm clinicile filtrate în funcție de căutare
+  const [searchName, setSearchName] = useState(""); // Stocăm termenul de căutare
+  const navigate = useNavigate(); // Hook pentru a naviga între pagini
+  const [selectedClinic, setSelectedClinic] = useState(null); // Stocăm clinica selectată pentru detalii
+  const [popupOpen, setPopupOpen] = useState(false); // State pentru a controla vizibilitatea popup-ului de detalii
+
+  // Funcție pentru închiderea popup-ului de detalii
   const handlePopupClose = () => {
-    setPopupOpen(false);
-    setSelectedClinic(null);
+    setPopupOpen(false); // Închide popup-ul
+    setSelectedClinic(null); // Resetează clinica selectată
   };
-  //PopupOpen/CardClick
+
+  // Funcție pentru deschiderea popup-ului atunci când se face click pe un card de clinică
   const handleCardClick = (clinic) => {
-    setSelectedClinic(clinic);
-    setPopupOpen(true);
+    setSelectedClinic(clinic); // Setăm clinica selectată
+    setPopupOpen(true); // Deschidem popup-ul cu detalii
   };
-  
+
+  // Dezactivăm scroll-ul atunci când AppointmentPage este montată și îl restaurăm când se demontează
   useEffect(() => {
-    // Disable scrolling when AppointmentPage is mounted
-    document.body.style.overflow = "hidden";
-  
-    // Cleanup function to restore scrolling when the component unmounts
+    document.body.style.overflow = "hidden"; // Dezactivăm scroll-ul
+
     return () => {
-      document.body.style.overflow = "auto";
+      document.body.style.overflow = "auto"; // Restaurăm scroll-ul când componenta se demontează
     };
   }, []);
-  
-  // Load GeoJSON data
+
+  // Încărcăm datele GeoJSON și le stocăm în state-ul clinicData și filteredData folosind hook-ul personalizat
+  useGeoJsonLoader(null, setClinicData, setFilteredData);
+
+  // Obținem locația utilizatorului folosind API-ul geolocation al browser-ului
   useEffect(() => {
-    fetch("/spitale.geojson")
-      .then((response) => response.json())
-      .then((data) => {
-        // Map all feature properties into clinics array
-        const clinics = data.features.map((feature) => ({
-        ...feature.properties, // Spread all properties into the clinic object
-      }));
-        setClinicData(clinics);
-        setFilteredData(clinics);
-      })
-      .catch((error) => console.error("Error loading GeoJSON data:", error));
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Eroare la obținerea locației utilizatorului:", error);
+        }
+      );
+    } else {
+      console.error("Geolocation nu este susținut de acest browser.");
+    }
   }, []);
 
-// Get user location
-useEffect(() => {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setUserLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        });
-      },
-      (error) => {
-        console.error("Error getting user location:", error);
-      }
-    );
-  } else {
-    console.error("Geolocation is not supported by this browser.");
-  }
-}, []);
-
-  // Handle search input
+  // Funcție pentru a manipula schimbările din câmpul de căutare
   const handleSearchChange = (event) => {
     const value = event.target.value;
-    setSearchName(value);
-    const filtered = clinicData.filter((clinic) =>
-      clinic.name.toLowerCase().includes(value.toLowerCase())
+    setSearchName(value); // Actualizăm termenul de căutare
+    const filtered = clinicData.filter(
+      (clinic) => clinic.name.toLowerCase().includes(value.toLowerCase()) // Filtrăm clinicile după nume
     );
-    setFilteredData(filtered);
+    setFilteredData(filtered); // Actualizăm lista clinicilor filtrate
   };
 
-  // Scroll to specific section
-  const handleScrollToSection = (section) => {
-    navigate("/", { state: { scrollTo: section } });
+  // Funcție pentru a naviga la o secțiune specifică (Home, About Us, Services)
+  const handleScrollToHome = (section) => {
+    navigate("/"); // Navigăm la pagina principală (poți modifica pentru a derula la secțiuni specifice, dacă este necesar)
   };
 
   return (
-    <Box sx={{ height: "100vh", display: "flex", flexDirection: "column", width: "100vw" }}>
-      {/* Full-Width Header */}
-      <AppBar
-        position="static"
-        sx={{
-          position: "fixed", // Sticks at the top of the page
-          top: 0,
-          left: 0,
-          width: "100vw",
-          backgroundColor: "#1F2B6C",
-          boxShadow: "none",
-          zIndex: 1201,
-        }}
-      >
-        <Toolbar
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "0 20px",
-            maxWidth: "1200px", 
-            width: "100%",
-            margin: "0 auto", 
-          }}
-        >
-          {/* Logo */}
-          <Button
-            sx={{
-              fontWeight: "bold",
-              color: "#fff",
-              fontSize: "1.25rem",
-              textTransform: "none",
-              "&:hover": {
-                backgroundColor: "transparent",
-              },
-            }}
-            onClick={() => navigate("/")}
-          >
-          RO<span style={{ color: "#03A9F4" }}>SPITAL</span>
-          </Button>
+    <Box
+      sx={{
+        height: "100vh", // Setăm înălțimea întregii pagini
+        display: "flex", // Folosim flexbox pentru a organiza elementele
+        flexDirection: "column", // Aliniem coloanele vertical
+        width: "100vw", // Setăm lățimea întregii pagini
+      }}
+    >
+      {/* Header-ul complet, cu funcții de derulare */}
+      <FullWidthHeader
+        handleScrollToHome={handleScrollToHome}
+        handleScrollToAbout={handleScrollToHome}
+        handleScrollToServices={handleScrollToHome}
+      />
 
-          {/* Navigation */}
-          <Box sx={{ display: "flex", gap: 2 }}>
-            <Button color="inherit" sx={{ textTransform: "capitalize" }} onClick={() => navigate("/")}>
-              Home
-            </Button>
-            <Button color="inherit" sx={{ textTransform: "capitalize" }} onClick={() => handleScrollToSection(aboutUsRef)}>
-              About us
-            </Button>
-            <Button color="inherit" sx={{ textTransform: "capitalize" }} onClick={() => handleScrollToSection(servicesRef)}>
-              Services
-            </Button>
-          </Box>
-
-          {/* Login Button */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Button
-              variant="contained"
-                sx={{
-                  backgroundColor: "#03A9F4",
-                  color: "#fff",
-                  textTransform: "capitalize",
-                  borderRadius: "20px",
-                  padding: "5px 20px",
-                  "&:hover": {
-                    backgroundColor: "#0288D1",
-                  },
-                }}
-                onClick={() => navigate('/login')} // Navigate to login page
-              >
-              Login
-            </Button>
-            <IconButton
-              sx={{
-                color: "#fff",
-                "&:hover": { backgroundColor: "rgba(255, 255, 255, 0.2)" },
-              }}
-              //onClick={() => navigate("/profile")} // Navigate to user profile
-            >
-            <AccountCircle sx={{ fontSize: "2rem" }} />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
-      {/* Main Content */}
+      {/* Secțiunea principală a conținutului */}
       <Box
         sx={{
-          display: "flex",
-          flexGrow: 1,
-          marginTop: "60px",
-          height: "100vh",
+          display: "flex", // Folosim flexbox pentru a împărți zona de clinică și hartă
+          flexGrow: 1, // Permitem creșterea secțiunii de clinică și harta
+          marginTop: "60px", // Ajustăm pentru înălțimea header-ului
+          height: "100vh", // Setăm înălțimea secțiunii
         }}
       >
-        {/* Clinic List Section */}
+        {/* Secțiunea de listă a clinicilor (stânga) */}
         <Box
           sx={{
-            width: "20%",
-            overflowY: "auto",
-            borderRight: "1px solid #ddd",
-            padding: "10px",
+            width: "20%", // Setăm lățimea secțiunii de clinică
+            overflowY: "auto", // Permitem derularea dacă conținutul depășește containerul
+            borderRight: "1px solid #ddd", // Adăugăm bordură între secțiuni
+            padding: "10px", // Padding pentru listă
           }}
         >
-          {/* Search Input */}
+          {/* Căutarea clinicilor după nume */}
           <TextField
             label="Search Hospitals"
             variant="outlined"
             fullWidth
-            value={searchName}
-            onChange={handleSearchChange}
-            sx={{ marginBottom: "20px" }}
+            value={searchName} // Legătura cu state-ul searchName
+            onChange={handleSearchChange} // Apelăm funcția de filtrare când schimbăm căutarea
+            sx={{ marginBottom: "20px" }} // Adăugăm margine între căutare și lista de clinici
           />
 
-          {/* Clinic List */}
+          {/* Listă cu clinicile, afișăm doar clinicile filtrate */}
           <List>
             {filteredData.map((clinic, index) => (
               <React.Fragment key={index}>
                 <ListItem
                   sx={{
                     display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
+                    justifyContent: "space-between", // Așezăm elementele la colțuri opuse
+                    alignItems: "center", // Aliniem elementele pe axa verticală
                     padding: "10px 15px",
                     backgroundColor: "#f9f9f9",
                     borderRadius: "8px",
                     boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                    margin: "10px 0",
-                    cursor: "pointer", // Add cursor pointer
+                    margin: "10px 0", // Adăugăm margine între elementele din listă
+                    cursor: "pointer", // Facem elementele listabile
                   }}
-                    onClick={() => handleCardClick(clinic)} // Add click handler
+                  onClick={() => handleCardClick(clinic)} // Deschidem popup-ul cu detalii când facem click
                 >
                   <Box>
-                    <Typography
-                      variant="subtitle1"
-                      sx={{ fontWeight: "bold" }}
-                    >
-                      {clinic.name}
+                    <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
+                      {clinic.name} {/* Afișăm numele clinicii */}
                     </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "#757575" }}
-                    >
-                      {clinic.street}
+                    <Typography variant="body2" sx={{ color: "#757575" }}>
+                      {clinic.street} {/* Afișăm adresa clinicii */}
                     </Typography>
                   </Box>
                 </ListItem>
@@ -253,42 +149,19 @@ useEffect(() => {
           </List>
         </Box>
 
-        {/* Map Section */}
+        {/* Secțiunea cu harta pe dreapta */}
         <Box sx={{ flexGrow: 1 }}>
-          <Map />
+          <Map /> {/* Afișăm componenta Map */}
         </Box>
-
       </Box>
 
-        {/* Popup Dialog */}
-        <Dialog open={popupOpen} onClose={handlePopupClose}>
-          <DialogTitle>Hospital Details</DialogTitle>
-          <DialogContent>
-            {selectedClinic ? (
-              <Box>
-              {Object.entries(selectedClinic)
-                .filter(([key]) => key !== "@geometry") // Exclude the @geometry key
-                .map(([key, value]) => (
-                <Box key={key} sx={{ marginBottom: "8px" }}>
-                  <Typography variant="body1" sx={{ fontWeight: "bold", display: "inline" }}>
-                    {key}:{" "}
-                  </Typography>
-                  <Typography variant="body1" sx={{ display: "inline" }}>
-                    {value || "Not available"}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
-          ) : (
-            <Typography variant="body2">Loading...</Typography>
-          )}
-        </DialogContent>
-          <DialogActions>
-            <Button onClick={handlePopupClose} color="primary">
-              Close
-            </Button>
-          </DialogActions>
-        </Dialog>
+      {/* Dialog pentru afișarea detaliilor clinicii selectate */}
+      <DetailsDialog
+        open={popupOpen} // Controlează vizibilitatea dialogului
+        onClose={handlePopupClose} // Închide dialogul când este apelat
+        title="Hospital Details" // Titlul dialogului
+        details={selectedClinic} // Transmitem detaliile clinicii selectate
+      />
     </Box>
   );
 }

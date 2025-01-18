@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Spitalul Clinic Județean de Urgență Cluj-Napoca",
+    "adress": "Strada Clinicilor, nr. 3-5",
+    "latitude": 46.7659412,
+    "longitude": 23.5831731
+  },
+  {
+    "name": "Spitalul Clinic de Recuperare",
+    "adress": "Strada Viilor, nr. 46-50",
+    "latitude": 46.7549178,
+    "longitude": 23.5820064
+  },
+  {
+    "name": "Spitalul Clinic Municipal Cluj-Napoca",
+    "adress": "Strada Tăbăcarilor, nr. 11",
+    "latitude": 46.7893118,
+    "longitude": 23.6061074
+  },
+  {
+    "name": "Spitalul Clinic de Boli Infecțioase",
+    "adress": "Strada Iuliu Moldovan, nr. 23",
+    "latitude": 46.7638027,
+    "longitude": 23.5786053
+  },
+  {
+    "name": "Spitalul Clinic de Pneumoftiziologie Leon Daniello",
+    "adress": "Strada B.P. Hașdeu, nr. 6",
+    "latitude": 46.7639388,
+    "longitude": 23.580387
+  },
+  {
+    "name": "Institutul Inimii Niculae Stancioiu",
+    "adress": "Strada Moților, nr. 19-21",
+    "latitude": 46.7669628,
+    "longitude": 23.5800418
+  },
+  {
+    "name": "Spitalul Militar de Urgență Dr. Constantin Papilian",
+    "adress": "Strada General Traian Moșoiu, nr. 22",
+    "latitude": 46.7669628,
+    "longitude": 23.5800418
+  },
+  {
+    "name": "Spitalul Clinic de Pediatrie 1",
+    "adress": "Calea Moților, nr. 68",
+    "latitude": 46.7660097,
+    "longitude": 23.5761302
+  },
+  {
+    "name": "Spitalul Clinic de Pediatrie 2",
+    "adress": "Strada Crișan, nr. 3-5",
+    "latitude": 46.777645,
+    "longitude": 23.5833794
+  },
+  {
+    "name": "Spitalul Clinic de Obstetrică-Ginecologie Dominic Stanca",
+    "adress": "Bulevardul 21 Decembrie 1989, nr. 57",
+    "latitude": 46.7744383,
+    "longitude": 23.5977866
+  },
+  {
+    "name": "Institutul Oncologic Prof. Dr. Ion Chiricuță",
+    "adress": "Strada Republicii, nr. 34-36",
+    "latitude": 46.7634268,
+    "longitude": 23.5848328
+  },
+  {
+    "name": "Institutul Regional de Gastroenterologie și Hepatologie Prof. Dr. Octavian Fodor",
+    "adress": "Strada Croitorilor, nr. 19-21",
+    "latitude": 46.7761376,
+    "longitude": 23.5898055
+  },
+  {
+    "name": "Spitalul Clinic de Psihiatrie",
+    "adress": "Strada Decebal, nr. 126",
+    "latitude": 46.7847717,
+    "longitude": 23.5911481
+  },
+  {
+    "name": "Spitalul Clinic de Neurologie",
+    "adress": "Strada Victor Babeș, nr. 43",
+    "latitude": 46.7638293,
+    "longitude": 23.5793742
+  },
+  {
+    "name": "Spitalul Clinic de Chirurgie",
+    "adress": "Strada Croitorilor, nr. 19-21",
+    "latitude": 46.7638293,
+    "longitude": 23.5793742
+  },
+  {
+    "name": "Institutul Oncologic Prof. Dr. Ion Chiricuță",
+    "adress": "Str. Republicii 34-36",
+    "latitude":46.7638069,
+    "longitude": 23.5832739
+  }
+]
